@@ -6,64 +6,131 @@ using System.Collections.Generic;
 using System.Linq;
 using QuantConnect.Algorithm;
 using QuantConnect;
+using GeneticTree.RiskManagement;
+using QuantConnect.Data.Market;
 
 namespace GeneticTree
 {
     public partial class GeneticTreeAlgorithmExample : QCAlgorithm
     {
-        private Rule _entry;
-        private Rule _exit;
-        private Symbol _symbol;
         private readonly bool IsOutOfSampleRun = true;
         private readonly int oosPeriod = 3;
+        public bool verbose = false;
+
+        private List<Rule> _entry;
+        private List<Rule> _exit;
+        public List<Symbol> _symbols;
+        FxRiskManagment RiskManager;
 
         public override void Initialize()
         {
-            SetCash(1000);
-            SetStartDate(Config.GetValue<DateTime>("startDate", new DateTime(2017, 6, 12)));
-            SetEndDate(Config.GetValue<DateTime>("endDate", new DateTime(2017, 7, 22)));
+            SetCash(10000);
+            SetStartDate(Config.GetValue<DateTime>("startDate", new DateTime(2017, 1, 12)));
+            //SetEndDate(Config.GetValue<DateTime>("endDate", new DateTime(2017, 7, 22)));
 
             if (IsOutOfSampleRun)
             {
-                var startDate = new DateTime(year: 2016, month: 1, day: 1);
-                SetStartDate(startDate);
-                SetEndDate(startDate.AddMonths(oosPeriod));
+                //var startDate = new DateTime(year: 2016, month: 1, day: 1);
+                //SetStartDate(startDate);
+                //SetEndDate(startDate.AddMonths(oosPeriod));
                 RuntimeStatistics["ID"] = GetParameter("ID");
                 SetParameters(config.ToDictionary(k => k.Key, v => v.Value.ToString()));
             }
 
-            _symbol = AddSecurity(SecurityType.Forex, "EURUSD", Resolution.Minute, Market.Oanda, false, 50m, false).Symbol;
             SetBrokerageModel(QuantConnect.Brokerages.BrokerageName.OandaBrokerage);
             var con = new TickConsolidator(new TimeSpan(1, 0, 0));
 
            // SetBenchmark(_symbol);
-
            
-
+            _symbols = new List<Symbol>();
+            _entry = new List<Rule>();
+            _exit = new List<Rule>();
+            foreach (var symbol in TradingSymbols.OandaFXMajors)
+            {
+                var security= AddSecurity(SecurityType.Forex, symbol, Configuration._resolution, Market.Oanda, true, Configuration._leverage, false);
+                _symbols.Add(security.Symbol);
+            }
+            foreach (var symbol in TradingSymbols.OandaCFD)
+            {
+                //    AddSecurity(SecurityType.Cfd, symbol, _resolution, Market.Oanda, true, _leverage, false);
+            }
             var factory = new SignalFactory();
+            foreach (var symbol in _symbols)
+            {
+                Securities[symbol].VolatilityModel = new ThreeSigmaVolatilityModel(STD(symbol: symbol, period: 12 * 60, resolution: Configuration._resolution), 20.0m);
 
-            _entry = factory.Create(this, _symbol, true, Resolution.Minute);
-            _exit = factory.Create(this, _symbol, false, Resolution.Minute);
+                _entry.Add(factory.Create(this, symbol, true, Configuration._resolution));
+                _exit.Add(factory.Create(this, symbol, false, Configuration._resolution));
+            }
+
+            RiskManager = new FxRiskManagment(Portfolio, Configuration._riskPerTrade, Configuration._maxExposurePerTrade, Configuration._maxExposure, Configuration._lotSize);
 
         }
 
-        public override void OnData(Slice e)
+        public void OnData(QuoteBars data)
         {
-            if (!LiveMode && Portfolio.TotalPortfolioValue < 600)
+            foreach (var entry in _entry)
             {
-                Quit();
+                if (entry.IsReady())
+                {
+                    EntrySignal(data, entry);
+                }
             }
+            foreach (var entry in _exit)
+            {
+                if (entry.IsReady())
+                {
+                    ExitSignal(entry);
+                }
+            }
+        }
 
-            if (!_entry.IsReady()) return;
-            if (!Portfolio.Invested && _entry.IsTrue())
+        public void ExitSignal(Rule signal)
+        {
+
+            if (verbose && signal.IsTrue())
             {
-                SetHoldings(_symbol, 0.9m);
-                Log("buy: " + Portfolio[_symbol].Price + " Portfolio:" + Portfolio.TotalPortfolioValue);
+                Log(string.Format("signal symbol:: {0}", signal.Symbol));
             }
-            else if (_exit.IsTrue())
+            if (Portfolio[signal.Symbol].Invested && signal.IsTrue())
             {
-                Liquidate();
-                Log("liq: " + Portfolio[_symbol].Price + " Portfolio:" + Portfolio.TotalPortfolioValue);
+                Liquidate(signal.Symbol);
+            }
+            else if (Portfolio[signal.Symbol].Invested && Portfolio[signal.Symbol].UnrealizedProfitPercent > Configuration.takeProfit)
+            {
+                //safeguard profits, 
+                //liquidate half
+                MarketOrder(signal.Symbol, -(Portfolio[signal.Symbol].Quantity / 2));
+            }
+        }
+
+        public void EntrySignal(QuoteBars data, Rule signal)
+        {
+
+            if (verbose && signal.IsTrue())
+            {
+                Log(string.Format("signal symbol:: {0}", signal.Symbol));
+            }
+            if (!Portfolio[signal.Symbol].Invested)
+            {
+                if (signal.IsTrue())
+                {
+
+                    var openPrice = Securities[signal.Symbol].Price;
+                    var actualAction = AgentAction.GoLong;
+                    var entryValues = RiskManager.CalculateEntryOrders(data, signal.Symbol, actualAction);
+                    if (entryValues.Item1 != 0)
+                    {
+
+                        var ticket = MarketOrder(signal.Symbol, entryValues.Item1);
+                        StopMarketOrder(signal.Symbol, -entryValues.Item1, entryValues.Item2, tag: entryValues.Item3.ToString("0.000000"));
+                        if (verbose)
+                        {
+                            Log(string.Format("MarketOrder:: {0} {1}", signal.Symbol, entryValues.Item1));
+                        }
+                    }
+                    //MarketOrder(signal.Symbol, size, false, "");
+                }
             }
         }
 
@@ -73,15 +140,15 @@ namespace GeneticTree
             {"EntryIndicator3",  -1},
             {"EntryIndicator4",  2},
             {"EntryIndicator5",  3},
-            {"EntryIndicator1Direction",  0},
-            {"EntryIndicator2Direction",  0},
+            {"EntryIndicator1Direction",  1},
+            {"EntryIndicator2Direction",  1},
             {"EntryIndicator3Direction",  1},
-            {"EntryIndicator4Direction",  0},
+            {"EntryIndicator4Direction",  1},
             {"EntryIndicator5Direction",  1},
-            {"EntryOperator1",  0},
+            {"EntryOperator1",  1},
             {"EntryOperator2",  1},
-            {"EntryOperator3",  0},
-            {"EntryOperator4",  0},
+            {"EntryOperator3",  1},
+            {"EntryOperator4",  1},
             {"EntryRelationship1",  0},
             {"EntryRelationship2",  1},
             {"EntryRelationship3",  1},
@@ -93,66 +160,21 @@ namespace GeneticTree
             {"ExitIndicator5",  2},
             {"ExitIndicator1Direction",  0},
             {"ExitIndicator2Direction",  0},
-            {"ExitIndicator3Direction",  1},
-            {"ExitIndicator4Direction",  1},
+            {"ExitIndicator3Direction",  0},
+            {"ExitIndicator4Direction",  0},
             {"ExitIndicator5Direction",  0},
-            {"ExitOperator1",  0},
-            {"ExitOperator2",  0},
-            {"ExitOperator3",  0},
+            {"ExitOperator1",  1},
+            {"ExitOperator2",  1},
+            {"ExitOperator3",  1},
             {"ExitOperator4",  1},
             {"ExitRelationship1",  0},
             {"ExitRelationship2",  1},
             {"ExitRelationship3",  0},
             {"ExitRelationship4",  1},
             {"period",  1},
-            {"slowPeriod",  2},
-            {"fastPeriod",  3},
+            {"slowPeriod",  200},
+            {"fastPeriod",  20},
             {"signalPeriod",  4 }
         };
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

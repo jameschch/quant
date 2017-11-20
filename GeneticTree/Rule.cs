@@ -4,6 +4,7 @@ using QuantConnect.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using QuantConnect;
 
 namespace GeneticTree
 {
@@ -12,10 +13,11 @@ namespace GeneticTree
     {
 
         public IEnumerable<ISignal> List { get; }
-
-        public Rule(IEnumerable<ISignal> signal)
+        public Symbol Symbol { get; }
+        public Rule(Symbol symbol, IEnumerable<ISignal> signal)
         {
             List = signal;
+            Symbol = symbol;
         }
 
         public bool IsReady()
