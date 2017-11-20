@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Linq;
 using QuantConnect.Securities;
-using QuantConnect.Brokerages;
-using QuantConnect.Orders;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
-using System.Collections;
 using System.Collections.Generic;
 namespace GeneticTree.RiskManagement
 {

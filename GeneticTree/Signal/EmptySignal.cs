@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QuantConnect.Data;
-using QuantConnect.Indicators;
+﻿using QuantConnect.Data;
 
 namespace GeneticTree.Signal
 {

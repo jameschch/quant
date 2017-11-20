@@ -115,10 +115,8 @@ namespace GeneticTree
             {
                 if (signal.IsTrue())
                 {
-
                     var openPrice = Securities[signal.Symbol].Price;
-                    var actualAction = AgentAction.GoLong;
-                    var entryValues = RiskManager.CalculateEntryOrders(data, signal.Symbol, actualAction);
+                    var entryValues = RiskManager.CalculateEntryOrders(data, signal.Symbol, AgentAction.GoLong);
                     if (entryValues.Item1 != 0)
                     {
 
