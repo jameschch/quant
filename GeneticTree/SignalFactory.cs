@@ -104,7 +104,7 @@ namespace GeneticTree
 
                 case TechnicalIndicator.Stochastic:
                     var sto = _algorithm.STO(pair, _period, _resolution);
-                    signal = new OscillatorSignal(sto, direction);
+                    signal = new OscillatorSignal(sto, new[] { 20, 80 }, direction);
                     break;
 
                 case TechnicalIndicator.RelativeStrengthIndex:
@@ -124,7 +124,7 @@ namespace GeneticTree
 
                 case TechnicalIndicator.WilliamsPercentR:
                     var wr = _algorithm.WILR(pair, _period, _resolution);
-                    signal = new OscillatorSignal(wr, direction);
+                    signal = new OscillatorSignal(wr, new[] { -20, -80 }, direction);
                     break;
 
                 case TechnicalIndicator.PercentagePriceOscillator:

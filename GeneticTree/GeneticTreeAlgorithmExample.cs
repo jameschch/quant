@@ -14,7 +14,7 @@ namespace GeneticTree
         private Rule _entry;
         private Rule _exit;
         private Symbol _symbol;
-        private readonly bool IsOutOfSampleRun = false;
+        private readonly bool IsOutOfSampleRun = true;
         private readonly int oosPeriod = 3;
 
         public override void Initialize()
@@ -26,24 +26,24 @@ namespace GeneticTree
             if (IsOutOfSampleRun)
             {
                 var startDate = new DateTime(year: 2016, month: 1, day: 1);
-                SetEndDate(startDate.AddMonths(oosPeriod));
                 SetStartDate(startDate);
+                SetEndDate(startDate.AddMonths(oosPeriod));
                 RuntimeStatistics["ID"] = GetParameter("ID");
                 SetParameters(config.ToDictionary(k => k.Key, v => v.Value.ToString()));
             }
 
-            _symbol = AddSecurity(SecurityType.Crypto, "BTCUSD", Resolution.Tick, Market.GDAX, false, 1m, false).Symbol;
-            SetBrokerageModel(QuantConnect.Brokerages.BrokerageName.GDAX, AccountType.Cash);
+            _symbol = AddSecurity(SecurityType.Forex, "EURUSD", Resolution.Minute, Market.Oanda, false, 50m, false).Symbol;
+            SetBrokerageModel(QuantConnect.Brokerages.BrokerageName.OandaBrokerage);
             var con = new TickConsolidator(new TimeSpan(1, 0, 0));
 
-            SetBenchmark(_symbol);
+           // SetBenchmark(_symbol);
 
            
 
             var factory = new SignalFactory();
 
-            _entry = factory.Create(this, _symbol, true);
-            _exit = factory.Create(this, _symbol, false);
+            _entry = factory.Create(this, _symbol, true, Resolution.Minute);
+            _exit = factory.Create(this, _symbol, false, Resolution.Minute);
 
         }
 
