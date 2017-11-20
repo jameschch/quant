@@ -27,7 +27,7 @@ namespace GeneticTree
 
         public bool IsTrue()
         {
-            StringBuilder expression = new StringBuilder();
+            string expression = "";
 
             foreach (var item in List)
             {
@@ -43,25 +43,25 @@ namespace GeneticTree
                     isTrue += ")";
                 }
 
-                expression.Append(isTrue);
+                expression = expression+(isTrue);
 
                 if (item.Child != null)
                 {
                     if (item.Operator == Operator.And)
                     {
-                        expression.Append(" and ");
+                        expression = expression +(" and ");
                     }
                     else if (new[] { Operator.Or, Operator.OrInclusive }.Contains(item.Operator))
                     {
-                        expression.Append(" or ");
+                        expression = expression +(" or ");
                     }
                     else if (item.Operator == Operator.Not)
                     {
-                        expression.Append(" and !");
+                        expression = expression +(" and !");
                     }
                     else if (new[] { Operator.Nor, Operator.NorInclusive }.Contains(item.Operator))
                     {
-                        expression.Append(" or !");
+                        expression = expression +(" or !");
                     }
                 }
             }

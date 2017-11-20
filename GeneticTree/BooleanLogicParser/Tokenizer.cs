@@ -63,10 +63,10 @@ namespace GeneticTree.BooleanLogicParser
 
         private Token ParseKeyword()
         {
-            var text = new StringBuilder();
+            var text = "";
             while (_text.Length > i && Char.IsLetter((char) _text[i]))
             {
-                text.Append((char) _text[i]);
+                text = text + ((char) _text[i]);
                 i++;
             }
 

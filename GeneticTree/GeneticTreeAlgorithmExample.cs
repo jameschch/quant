@@ -25,7 +25,7 @@ namespace GeneticTree
         public override void Initialize()
         {
             SetCash(10000);
-            SetStartDate(Config.GetValue<DateTime>("startDate", new DateTime(2017, 1, 12)));
+            SetStartDate(Configuration.GetConfigDateTime("startDate", new DateTime(2017, 1, 12), this));
             //SetEndDate(Config.GetValue<DateTime>("endDate", new DateTime(2017, 7, 22)));
 
             if (IsOutOfSampleRun)
