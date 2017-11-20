@@ -135,7 +135,7 @@ namespace GeneticTree
         private static Dictionary<string, int> config = new Dictionary<string, int> {
             {"EntryIndicator1",  0},
             {"EntryIndicator2",  10},
-            {"EntryIndicator3",  -1},
+            {"EntryIndicator3",  0},
             {"EntryIndicator4",  2},
             {"EntryIndicator5",  3},
             {"EntryIndicator1Direction",  1},
@@ -154,7 +154,7 @@ namespace GeneticTree
             {"ExitIndicator1",  6},
             {"ExitIndicator2",  5},
             {"ExitIndicator3",  4},
-            {"ExitIndicator4",  -1},
+            {"ExitIndicator4",  0},
             {"ExitIndicator5",  2},
             {"ExitIndicator1Direction",  0},
             {"ExitIndicator2Direction",  0},
