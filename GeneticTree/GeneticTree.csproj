@@ -70,6 +70,7 @@
     <Compile Include="Signal\EmptySignal.cs" />
     <Compile Include="Signal\ISignal.cs" />
     <Compile Include="Signal\OscillatorSignal.cs" />
+    <Compile Include="Signal\BBOscillatorSignals.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -69,7 +69,7 @@ namespace GeneticTree
 
         private static Dictionary<string, int> config = new Dictionary<string, int> {
             {"EntryIndicator1",  0},
-            {"EntryIndicator2",  1},
+            {"EntryIndicator2",  10},
             {"EntryIndicator3",  -1},
             {"EntryIndicator4",  2},
             {"EntryIndicator5",  3},

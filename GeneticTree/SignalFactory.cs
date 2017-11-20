@@ -34,8 +34,8 @@ namespace GeneticTree
             WilliamsPercentR = 6,
             PercentagePriceOscillator = 7,
             AverageDirectionalIndex = 8,
-            //AverageTrueRange = 9
-            //BollingerBands = 10
+            AverageTrueRange = 9,
+            BollingerBands = 10
         }
 
         public override Rule Create(QCAlgorithm algorithm, Symbol symbol, bool isEntryRule, Resolution resolution = Resolution.Hour)
@@ -149,9 +149,10 @@ namespace GeneticTree
                     //    signal = new OscillatorSignal(atr, oscillatorThresholds, direction);
                     //    break;
 
-                    //todo: bollinger bands setup
-                    //case TechicalIndicators.BollingerBands:
-                    //    throw new NotImplementedException("WIP");
+                case TechnicalIndicator.BollingerBands:
+                    var bb = _algorithm.BB(pair, period: 20, k: 2);
+                    signal = new BBOscillatorSignal(bb, direction);
+                    break;
             }
 
             return signal;

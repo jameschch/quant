@@ -151,7 +151,7 @@ namespace GeneticTree.Signal
         /// </summary>
         /// <param name="indicatorCurrentValue">The indicator current value.</param>
         /// <returns></returns>
-        private ThresholdState GetThresholdState(decimal indicatorCurrentValue)
+        protected virtual ThresholdState GetThresholdState(decimal indicatorCurrentValue)
         {
             var positionSignal = ThresholdState.InBetween;
             if (indicatorCurrentValue > _thresholds[1])
