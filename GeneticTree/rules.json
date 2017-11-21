@@ -1,0 +1,30 @@
+﻿{
+  "rules": [
+    {
+      "name": "Entry",
+      "type": "entry",
+      "direction": "long",
+      "indicators": {
+        "Signal": [ 12, 10, 3, 7, 5 ],
+        "Direction": [ 1, 1, 1, 1, 1 ],
+        "Operator": [ 0, 1, 1, 1 ],
+        "Relationship": [ 1, 1, 1, 1 ]
+      }
+    },
+    {
+      "name": "Exit",
+      "type": "exit",
+      "direction": "short",
+      "indicators": {
+        "Signal": [ 0, 4, 1, 2, 3 ],
+        "Direction": [ 1, 1, 1, 1, 1 ],
+        "Operator": [ 0, 0, 1, 0 ],
+        "Relationship": [ 1, 1, 1, 1 ]
+      }
+    }
+  ],
+  "period": 1,
+  "slowPeriod": 200,
+  "fastPeriod": 20,
+  "signalPeriod": 4
+}

@@ -17,7 +17,7 @@ namespace GeneticTree.Signal
         private decimal _previousIndicatorValue;
         private ThresholdState _previousSignal;
         private int[] _thresholds;
-        private Direction _direction;
+        protected Direction _direction;
         static int[] defaultThresholds = new int[2] { 20, 80 };
 
         /// <summary>
@@ -128,9 +128,14 @@ namespace GeneticTree.Signal
         /// <summary>
         ///     Updates the <see cref="Signal" /> status.
         /// </summary>
-        private void Indicator_Updated(object sender, IndicatorDataPoint updated)
+        protected virtual void Indicator_Updated(object sender, IndicatorDataPoint updated)
         {
             var actualPositionSignal = GetThresholdState(updated);
+            ProcessThresholdStateChange(actualPositionSignal, updated);
+        }
+
+        protected void ProcessThresholdStateChange(ThresholdState actualPositionSignal, IndicatorDataPoint updated)
+        {
             if (!Indicator.IsReady)
             {
                 _previousIndicatorValue = updated.Value;

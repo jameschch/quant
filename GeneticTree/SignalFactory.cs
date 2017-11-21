@@ -36,7 +36,8 @@ namespace GeneticTree
             AverageDirectionalIndex = 8,
             AverageTrueRange = 9,
             BollingerBands = 10,
-            ExponentialMovingAverage = 11
+            ExponentialMovingAverage = 11,
+            ChannelBreakout=12
         }
 
         public override Rule Create(QCAlgorithm algorithm, Symbol symbol, bool isEntryRule, Resolution resolution = Resolution.Hour)
@@ -160,6 +161,14 @@ namespace GeneticTree
                 case TechnicalIndicator.BollingerBands:
                     var bb = _algorithm.BB(pair, period: 20, k: 2);
                     signal = new BBOscillatorSignal(bb, direction);
+                    break;
+
+                case TechnicalIndicator.ChannelBreakout:
+                    var delay = new Delay(5);
+                    var _max = delay.Of(_algorithm.MAX(pair, 25));
+                    var _min = delay.Of(_algorithm.MIN(pair, 25));
+                    var cur = _algorithm.MAX(pair, 1);
+                    signal = new ChannelOscillatorSignal(cur,_max, _min, direction);
                     break;
             }
 

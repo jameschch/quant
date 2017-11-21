@@ -1,0 +1,43 @@
+﻿       private readonly Dictionary<string, string> parametersToBacktest = new Dictionary<string, string>
+        {
+            {"EntryIndicator1", "11"},
+            {"EntryIndicator2", "8"},
+            {"EntryIndicator3", "3"},
+            {"EntryIndicator4", "7"},
+            {"EntryIndicator5", "5"},
+            {"EntryIndicator6", "0"},
+            {"EntryIndicator1Direction", "1"},//0
+            {"EntryIndicator2Direction", "1"},//0
+            {"EntryIndicator3Direction", "1"}, //1
+            {"EntryIndicator4Direction", "1"}, //1
+            {"EntryIndicator5Direction", "1"},//0
+            {"EntryIndicator6Direction", "1"},//0
+            {"EntryIndicator1Operator", "1"},//0//0
+            {"EntryIndicator2Operator", "0"},//0//1
+            {"EntryIndicator3Operator", "0"},//1
+            {"EntryIndicator4Operator", "0"},//1
+            {"EntryIndicator5Operator", "0"},//0
+            {"ExitIndicator1", "4"},
+            {"ExitIndicator2", "0"},
+            {"ExitIndicator3", "1"},
+            {"ExitIndicator4", "2"},
+            {"ExitIndicator5", "7"},
+            {"ExitIndicator6", "8"},
+            {"ExitIndicator1Direction", "0"},//1
+            {"ExitIndicator2Direction", "0"},
+            {"ExitIndicator3Direction", "0"},
+            {"ExitIndicator4Direction", "0"},
+            {"ExitIndicator5Direction", "0"},//0
+            {"ExitIndicator6Direction", "0"},//0
+            {"ExitIndicator1Operator", "1"},//0//1
+            {"ExitIndicator2Operator", "1"},//0//0
+            {"ExitIndicator3Operator", "0"},//1
+            {"ExitIndicator4Operator", "1"},//0//0
+            {"ExitIndicator5Operator", "0"},//0
+            {"EntrySMAFastPeriod", "20"},
+            {"EntrySMASlowPeriod", "200"},
+            {"ExitSMAFastPeriod", "20"},
+            {"ExitSMASlowPeriod", "220"},
+            {"EntryIndicatorSignalCount", "2"},
+            {"ExitIndicatorSignalCount", "6"}
+        };

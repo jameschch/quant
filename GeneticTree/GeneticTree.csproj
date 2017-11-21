@@ -56,6 +56,13 @@
     <Reference Include="QuantConnect.Indicators">
       <HintPath>..\..\..\QuantConnect\Lean\Launcher\bin\Release\QuantConnect.Indicators.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\..\..\QuantConnect\Lean\packages\RestSharp.106.0.1\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\QuantConnect\Lean\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BooleanLogicParser\Parser.cs" />
@@ -75,9 +82,12 @@
     <Compile Include="RiskManagement\FxRiskManagement.cs" />
     <Compile Include="TradingSymbols.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Signal\ChannelOscillatorSignal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="rules.json" />
+    <None Include="samples.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RiskManagement\" />

@@ -2,6 +2,11 @@
 using GeneticTree.RiskManagement;
 using QuantConnect;
 using QuantConnect.Algorithm;
+using RestSharp; // http://restsharp.org/
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GeneticTree
 {
@@ -87,6 +92,55 @@ namespace GeneticTree
                 }
             }
             return gene;
+        }
+
+        public static Dictionary<string, int> GetConfiguration(string url,Dictionary<string, int> config)
+        {
+
+            JObject jobj = JObject.Parse(LoadDataConfig(url));
+            JToken[] rules = jobj?["rules"].Children().ToArray();
+            foreach (JToken rule in rules)
+            {
+                
+                string ruleName = rule["name"].ToString();
+                JObject indicators = (JObject)rule["indicators"];
+                    var j = 1;
+                    foreach (JToken v in (JArray)indicators["Signal"])
+                    {
+                    config.Add(ruleName + "Indicator" + j, int.Parse(v.ToString()));
+                        j++;
+                    }
+                    j = 1;
+                foreach (JToken v in (JArray)indicators["Direction"])
+                    {
+                    config.Add(ruleName + "Indicator" + j + "Direction", int.Parse(v.ToString()));
+                        j++;
+                    }
+                    j = 1;
+                foreach (JToken v in (JArray)indicators["Operator"])
+                    {
+                    config.Add(ruleName + "Operator" + j, int.Parse(v.ToString()));
+                        j++;
+                    }
+                    j = 1;
+                foreach (JToken v in (JArray)indicators["Relationship"])
+                    {
+                    config.Add(ruleName + "Relationship" + j, int.Parse(v.ToString()));
+                        j++;
+                    }
+
+            }
+            return config;
+        }
+
+        private static string LoadDataConfig(string url)
+        {
+            var client = new RestClient();
+            client.BaseUrl = new Uri(url);
+            var request = new RestRequest();
+            IRestResponse response = client.Execute(request);
+
+            return response.Content;
         }
     }
 }

@@ -98,6 +98,12 @@ namespace GeneticTree.RiskManagement
             }
 
             var stopLossPrice = closePrice + (action == AgentAction.GoLong ? -volatility : volatility);
+            var increment = _portfolio.Securities[pair].PriceVariationModel.GetMinimumPriceVariation(_portfolio.Securities[pair]);
+            if (increment != 0)
+            {
+                stopLossPrice = Math.Round(stopLossPrice / increment) * increment;
+            }
+
             return Tuple.Create(quantity, stopLossPrice, action == AgentAction.GoLong ? data[pair].Ask.Close : data[pair].Bid.Close);
         }
 
@@ -124,6 +130,12 @@ namespace GeneticTree.RiskManagement
                     actualPrice = data[ticket.Symbol].Bid.Close;
                 }
                 var newStopLossPrice = actualPrice + (volatility * (originalOrderDirection == OrderDirection.Buy ? -1 : 1));
+                var increment = _portfolio.Securities[ticket.Symbol].PriceVariationModel.GetMinimumPriceVariation(_portfolio.Securities[ticket.Symbol]);
+                if (increment != 0)
+                {
+                    newStopLossPrice = Math.Round(newStopLossPrice / increment) * increment;
+                }
+
                 if ((originalOrderDirection == OrderDirection.Buy && newStopLossPrice > stopLossPrice)
                     || (originalOrderDirection == OrderDirection.Sell && newStopLossPrice < stopLossPrice))
                 {

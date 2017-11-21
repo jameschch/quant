@@ -27,7 +27,7 @@ namespace GeneticTree
             SetCash(10000);
             SetStartDate(Configuration.GetConfigDateTime("startDate", new DateTime(2017, 1, 12), this));
             //SetEndDate(Config.GetValue<DateTime>("endDate", new DateTime(2017, 7, 22)));
-
+            Configuration.GetConfiguration("http://www.mocky.io/v2/5a146bfe3100000628b34124",config);
             if (IsOutOfSampleRun)
             {
                 //var startDate = new DateTime(year: 2016, month: 1, day: 1);
@@ -131,7 +131,14 @@ namespace GeneticTree
                 }
             }
         }
+        private static Dictionary<string, int> config = new Dictionary<string, int> {
+            {"period",  1},
+            {"slowPeriod",  200},
+            {"fastPeriod",  20},
+            {"signalPeriod",  4 }
+        };
 
+        /*
         private static Dictionary<string, int> config = new Dictionary<string, int> {
             {"EntryIndicator1",  0},
             {"EntryIndicator2",  10},
@@ -174,5 +181,6 @@ namespace GeneticTree
             {"fastPeriod",  20},
             {"signalPeriod",  4 }
         };
+        */
     }
 }
