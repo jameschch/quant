@@ -20,6 +20,7 @@ namespace GeneticTree
         private List<Rule> _entry;
         private List<Rule> _exit;
         public List<Symbol> _symbols;
+        private Dictionary<Symbol, bool> tookPartialProfit = new Dictionary<QuantConnect.Symbol, bool>();
         FxRiskManagment RiskManager;
 
         public override void Initialize()
@@ -96,10 +97,13 @@ namespace GeneticTree
             {
                 Liquidate(signal.Symbol);
             }
-            else if (Portfolio[signal.Symbol].Invested && Portfolio[signal.Symbol].UnrealizedProfitPercent > Configuration.takeProfit)
+            else if (Portfolio[signal.Symbol].Invested && 
+                     Portfolio[signal.Symbol].UnrealizedProfitPercent > Configuration.takeProfit &&
+                     !tookPartialProfit[signal.Symbol])
             {
                 //safeguard profits, 
                 //liquidate half
+                tookPartialProfit[signal.Symbol] = true;
                 MarketOrder(signal.Symbol, -(Portfolio[signal.Symbol].Quantity / 2));
             }
         }
@@ -119,7 +123,7 @@ namespace GeneticTree
                     var entryValues = RiskManager.CalculateEntryOrders(data, signal.Symbol, AgentAction.GoLong);
                     if (entryValues.Item1 != 0)
                     {
-
+                        tookPartialProfit[signal.Symbol] = false;
                         var ticket = MarketOrder(signal.Symbol, entryValues.Item1);
                         StopMarketOrder(signal.Symbol, -entryValues.Item1, entryValues.Item2, tag: entryValues.Item3.ToString("0.000000"));
                         if (verbose)
