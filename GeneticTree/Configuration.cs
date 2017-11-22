@@ -110,6 +110,7 @@ namespace GeneticTree
                     config.Add(ruleName + "Indicator" + j, int.Parse(v.ToString()));
                         j++;
                     }
+                config.Add(ruleName + "NumberOfSignals", j-1);
                     j = 1;
                 foreach (JToken v in (JArray)indicators["Direction"])
                     {

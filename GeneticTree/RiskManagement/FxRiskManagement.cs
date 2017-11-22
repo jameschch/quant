@@ -163,7 +163,7 @@ namespace GeneticTree.RiskManagement
                 {
                     ticket.Cancel();
                 }
-                else if(_portfolio[ticket.Symbol].Quantity!=ticket.Quantity)
+                else if(Math.Abs(_portfolio[ticket.Symbol].Quantity)!=Math.Abs(ticket.Quantity))
                 {
                     ticket.Update(new UpdateOrderFields { Quantity = -(_portfolio[ticket.Symbol].Quantity) });
      

@@ -83,6 +83,8 @@
     <Compile Include="TradingSymbols.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Signal\ChannelOscillatorSignal.cs" />
+    <Compile Include="Signal\DonchianSignal.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

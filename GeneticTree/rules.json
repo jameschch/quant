@@ -5,10 +5,10 @@
       "type": "entry",
       "direction": "long",
       "indicators": {
-        "Signal": [ 12, 10, 3, 7, 5 ],
-        "Direction": [ 1, 1, 1, 1, 1 ],
-        "Operator": [ 0, 1, 1, 1 ],
-        "Relationship": [ 1, 1, 1, 1 ]
+        "Signal": [ 1, 2, 10 ],
+        "Direction": [ 0, 0, 0 ],
+        "Operator": [ 0, 0],
+        "Relationship": [ 1, 1 ]
       }
     },
     {
@@ -16,9 +16,9 @@
       "type": "exit",
       "direction": "short",
       "indicators": {
-        "Signal": [ 0, 4, 1, 2, 3 ],
-        "Direction": [ 1, 1, 1, 1, 1 ],
-        "Operator": [ 0, 0, 1, 0 ],
+        "Signal": [ 4, 0, 1, 2, 7, 8 ],
+        "Direction": [ 1, 1, 1, 1, 1 , 1 ],
+        "Operator": [ 0, 0, 1, 0, 1 ],
         "Relationship": [ 1, 1, 1, 1 ]
       }
     }

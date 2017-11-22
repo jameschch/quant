@@ -16,6 +16,7 @@ namespace GeneticTree.Signal
     {
         private decimal _previousIndicatorValue;
         private ThresholdState _previousSignal;
+        private int[] _lastSignals;
         private int[] _thresholds;
         protected Direction _direction;
         static int[] defaultThresholds = new int[2] { 20, 80 };
@@ -44,9 +45,9 @@ namespace GeneticTree.Signal
         ///     <see cref="Rule" /> class
         /// </param>
         /// <remarks>The oscillator must be registered BEFORE being used by this constructor.</remarks>
-        public OscillatorSignal(dynamic indicator, int[] thresholds, Direction direction)
+        public OscillatorSignal(dynamic indicator, int[] thresholds, Direction direction, int survivalPeriod = 1)
         {
-            Initialize(indicator, thresholds, direction);
+            Initialize(indicator, thresholds, direction, survivalPeriod);
         }
 
         /// <summary>
@@ -55,14 +56,14 @@ namespace GeneticTree.Signal
         /// <param name="indicator">The indicator.</param>
         /// <param name="thresholds">The thresholds.</param>
         /// <remarks>The oscillator must be registered BEFORE being used by this constructor.</remarks>
-        public OscillatorSignal(dynamic indicator, int[] thresholds)
+        public OscillatorSignal(dynamic indicator, int[] thresholds, int survivalPeriod = 1)
         {
-            Initialize(indicator, thresholds, Direction.LongOnly);
+            Initialize(indicator, thresholds, Direction.LongOnly, survivalPeriod);
         }
 
-        public OscillatorSignal(dynamic indicator, Direction direction)
+        public OscillatorSignal(dynamic indicator, Direction direction, int survivalPeriod = 1)
         {
-            Initialize(indicator, defaultThresholds, direction);
+            Initialize(indicator, defaultThresholds, direction, survivalPeriod);
         }
 
         /// <summary>
@@ -70,9 +71,9 @@ namespace GeneticTree.Signal
         /// </summary>
         /// <param name="indicator">The indicator.</param>
         /// <remarks>The oscillator must be registered BEFORE being used by this constructor.</remarks>
-        public OscillatorSignal(dynamic indicator)
+        public OscillatorSignal(dynamic indicator, int survivalPeriod = 1)
         {
-            Initialize(indicator, defaultThresholds, Direction.LongOnly);
+            Initialize(indicator, defaultThresholds, Direction.LongOnly, survivalPeriod);
         }
 
         /// <summary>
@@ -114,11 +115,19 @@ namespace GeneticTree.Signal
                 switch (_direction)
                 {
                     case Direction.LongOnly:
-                        signal = Signal == ThresholdState.CrossLowerFromBelow;
+                        foreach (ThresholdState s in _lastSignals)
+                        {
+                            signal = s == ThresholdState.CrossLowerFromBelow;
+                            if (signal) break;
+                        }
                         break;
 
                     case Direction.ShortOnly:
-                        signal = Signal == ThresholdState.CrossUpperFromAbove;
+                        foreach (ThresholdState s in _lastSignals)
+                        {
+                            signal = s == ThresholdState.CrossUpperFromAbove;
+                            if (signal) break;
+                        }
                         break;
                 }
             }
@@ -147,7 +156,10 @@ namespace GeneticTree.Signal
             var actualSignal = GetActualSignal(_previousSignal, actualPositionSignal);
 
             Signal = actualSignal;
+
             _previousIndicatorValue = updated.Value;
+            _lastSignals = Utils.shiftRight(_lastSignals);
+            _lastSignals[0] = (int)Signal;
             _previousSignal = actualSignal;
         }
 
@@ -213,12 +225,13 @@ namespace GeneticTree.Signal
         /// <param name="indicator">The indicator.</param>
         /// <param name="thresholds">The thresholds.</param>
         /// <param name="direction">The trade rule direction.</param>
-        private void Initialize(dynamic indicator, int[] thresholds, Direction direction)
+        private void Initialize(dynamic indicator, int[] thresholds, Direction direction, int survivalPeriod)
         {
             _thresholds = thresholds;
             Indicator = indicator;
             indicator.Updated += new IndicatorUpdatedHandler(Indicator_Updated);
             _direction = direction;
+            _lastSignals = new int[survivalPeriod];
         }
 
         /// <summary>

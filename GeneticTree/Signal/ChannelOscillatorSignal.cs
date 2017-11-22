@@ -4,7 +4,7 @@ using QuantConnect.Indicators;
 namespace GeneticTree.Signal
     {
         /// <summary>
-        ///     This class keeps track of an oscillator respect to its thresholds and updates an <see cref="BBOscillatorSignal" />
+    ///     This class keeps track of an oscillator respect to its thresholds and updates an <see cref="ChannelOscillatorSignal" />
         ///     for each given state.
         /// </summary>
         /// <seealso cref="QuantConnect.Algorithm.CSharp.ITechnicalIndicatorSignal" />
@@ -22,11 +22,11 @@ namespace GeneticTree.Signal
             get { return Indicator.IsReady; }
         }
             /// <summary>
-            ///     Initializes a new instance of the <see cref="BBOscillatorSignal" /> class.
+        ///     Initializes a new instance of the <see cref="ChannelOscillatorSignal" /> class.
             /// </summary>
             /// <param name="indicator">The indicator.</param>
             /// <remarks>The oscillator must be registered BEFORE being used by this constructor.</remarks>
-        public ChannelOscillatorSignal(IndicatorBase<IndicatorDataPoint> price, IndicatorBase<IndicatorDataPoint> max, IndicatorBase<IndicatorDataPoint> min, Direction direction) : base(price, direction)
+            public ChannelOscillatorSignal(IndicatorBase<IndicatorDataPoint> price, IndicatorBase<IndicatorDataPoint> max, IndicatorBase<IndicatorDataPoint> min, Direction direction) : base(price, direction)
             {
 
                 max.Updated += new IndicatorUpdatedHandler(Max_Updated);

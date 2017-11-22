@@ -16,7 +16,7 @@ namespace GeneticTree.Signal
         /// </summary>
         /// <param name="indicator">The indicator.</param>
         /// <remarks>The oscillator must be registered BEFORE being used by this constructor.</remarks>
-        public BBOscillatorSignal(BollingerBands indicator, Direction direction) : base(indicator, direction)
+        public BBOscillatorSignal(BollingerBands indicator, Direction direction, int survivalPeriod) : base(indicator, direction, survivalPeriod: survivalPeriod)
         {
 
             _bb = indicator;

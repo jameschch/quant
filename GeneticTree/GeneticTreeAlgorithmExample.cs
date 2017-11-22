@@ -26,8 +26,8 @@ namespace GeneticTree
         {
             SetCash(10000);
             SetStartDate(Configuration.GetConfigDateTime("startDate", new DateTime(2017, 1, 12), this));
-            //SetEndDate(Config.GetValue<DateTime>("endDate", new DateTime(2017, 7, 22)));
-            Configuration.GetConfiguration("http://www.mocky.io/v2/5a146bfe3100000628b34124",config);
+            SetEndDate(Configuration.GetConfigDateTime("endDate", new DateTime(2017, 10, 13), this));
+            Configuration.GetConfiguration("http://www.mocky.io/v2/5a15c8f42e00005200eab80e",config);
             if (IsOutOfSampleRun)
             {
                 //var startDate = new DateTime(year: 2016, month: 1, day: 1);
@@ -45,7 +45,7 @@ namespace GeneticTree
             _symbols = new List<Symbol>();
             _entry = new List<Rule>();
             _exit = new List<Rule>();
-            foreach (var symbol in TradingSymbols.OandaFXMajors)
+            foreach (var symbol in TradingSymbols.OandaFXMajors0)
             {
                 var security= AddSecurity(SecurityType.Forex, symbol, Configuration._resolution, Market.Oanda, true, Configuration._leverage, false);
                 _symbols.Add(security.Symbol);

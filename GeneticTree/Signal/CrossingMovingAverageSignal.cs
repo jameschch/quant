@@ -24,6 +24,7 @@ namespace GeneticTree.Signal
         private readonly CompositeIndicator<IndicatorDataPoint> _moving_average_difference;
         private readonly Direction _direction;
         private int _lastSignal;
+        private int[] _lastSignals;
         IndicatorBase<IndicatorDataPoint> _fast { get; set; }
         IndicatorBase<IndicatorDataPoint> _slow { get; set; }
 		//todo: name
@@ -42,13 +43,14 @@ namespace GeneticTree.Signal
         ///     Both Moving Averages must be registered BEFORE being used by this constructor.
         /// </remarks>
         public CrossingMovingAverageSignal(IndicatorBase<IndicatorDataPoint> fast,
-            IndicatorBase<IndicatorDataPoint> slow, Direction direction)
+            IndicatorBase<IndicatorDataPoint> slow, Direction direction, int survivalPeriod = 1)
         {
             _fast = fast;
             _slow = slow;
             _moving_average_difference = fast.Minus(slow);
             _moving_average_difference.Updated += ma_Updated;
             _direction = direction;
+            _lastSignals = new int[survivalPeriod];
         }
 
         /// <summary>
@@ -83,11 +85,19 @@ namespace GeneticTree.Signal
                 switch (_direction)
                 {
                     case Direction.LongOnly:
-                        signal = Signal == CrossingMovingAveragesSignals.FastCrossSlowFromBelow;
+                        foreach(CrossingMovingAveragesSignals s in _lastSignals)
+                        {
+                            signal = s == CrossingMovingAveragesSignals.FastCrossSlowFromBelow;
+                            if (signal) break;
+                        }
                         break;
 
                     case Direction.ShortOnly:
-                        signal = Signal == CrossingMovingAveragesSignals.FastCrossSlowFromAbove;
+                        foreach(CrossingMovingAveragesSignals s in _lastSignals)
+                        {
+                            signal = s == CrossingMovingAveragesSignals.FastCrossSlowFromAbove;
+                            if (signal) break;
+                        }
                         break;
                 }
             }
@@ -113,7 +123,8 @@ namespace GeneticTree.Signal
             {
                 Signal = CrossingMovingAveragesSignals.FastCrossSlowFromAbove;
             }
-
+            _lastSignals = Utils.shiftRight(_lastSignals);
+            _lastSignals[0] = (int)Signal;
             _lastSignal = actualSignal;
         }
         public override void Update(BaseData data)

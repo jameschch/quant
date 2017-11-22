@@ -12,8 +12,6 @@ namespace GeneticTree
     public class SignalFactory : AbstractSignalFactory
     {
 
-        //todo: derive maximum signals from config keys
-        private readonly int _maximumSignals = 5;
         int _period;
         int _slowPeriod;
         int _fastPeriod;
@@ -37,7 +35,8 @@ namespace GeneticTree
             AverageTrueRange = 9,
             BollingerBands = 10,
             ExponentialMovingAverage = 11,
-            ChannelBreakout=12
+            ChannelBreakout=12,
+            DonchianTrend = 13
         }
 
         public override Rule Create(QCAlgorithm algorithm, Symbol symbol, bool isEntryRule, Resolution resolution = Resolution.Hour)
@@ -50,11 +49,11 @@ namespace GeneticTree
             _slowPeriod = GetConfigValue("slowPeriod");
             _fastPeriod = GetConfigValue("fastPeriod");
             _signalPeriod = GetConfigValue("signalPeriod");
-
+            var numberOfSignals = GetConfigValue(entryOrExit+"NumberOfSignals");
             ISignal parent = null;
             List<ISignal> list = new List<ISignal>();
 
-            for (var i = 1; i <= _maximumSignals; i++)
+            for (var i = 1; i <= numberOfSignals; i++)
             {
                 var item = CreateIndicator(symbol, i, entryOrExit);
                 if (parent != null)
@@ -63,7 +62,7 @@ namespace GeneticTree
                 }
 
                 //last item won't have operator
-                if (i < _maximumSignals)
+                if (i < numberOfSignals)
                 {
                     var key = entryOrExit + "Operator" + i;
                     Operator op = (Operator)GetConfigValue(key);
@@ -108,12 +107,12 @@ namespace GeneticTree
 
                 case TechnicalIndicator.MovingAverageConvergenceDivergence:
                     var macd = _algorithm.MACD(pair, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, type:MovingAverageType.Simple, resolution:_resolution);
-                    signal = new CrossingMovingAverageSignal(macd, macd.Signal, direction);
+                    signal = new CrossingMovingAverageSignal(macd, macd.Signal, direction, 4);
                     break;
 
                 case TechnicalIndicator.Stochastic:
                     var sto = _algorithm.STO(pair, period: 14, resolution:_resolution);
-                    signal = new OscillatorSignal(sto, new[] { 20, 80 }, direction);
+                    signal = new OscillatorSignal(sto, new[] { 20, 80 }, direction, 4);
                     break;
 
                 case TechnicalIndicator.RelativeStrengthIndex:
@@ -160,17 +159,24 @@ namespace GeneticTree
 
                 case TechnicalIndicator.BollingerBands:
                     var bb = _algorithm.BB(pair, period: 20, k: 2);
-                    signal = new BBOscillatorSignal(bb, direction);
+                    signal = new BBOscillatorSignal(bb, direction, 5);
                     break;
 
                 case TechnicalIndicator.ChannelBreakout:
                     var delay = new Delay(5);
-                    var _max = delay.Of(_algorithm.MAX(pair, 25));
-                    var _min = delay.Of(_algorithm.MIN(pair, 25));
-                    var cur = _algorithm.MAX(pair, 1);
+                    var _max = delay.Of(_algorithm.MAX(pair, 20));
+                    var _min = delay.Of(_algorithm.MIN(pair, 20));
+                    var cur = _algorithm.MAX(pair, 1); //current value
                     signal = new ChannelOscillatorSignal(cur,_max, _min, direction);
                     break;
+            
+                case TechnicalIndicator.DonchianTrend:
+                    var dch0 = _algorithm.DCH(pair,20);
+                    var cur0 = _algorithm.MAX(pair, 1);
+                    signal = new DonchianSignal(cur0, dch0, 2, direction);
+                    break;
             }
+
 
             return signal;
         }
