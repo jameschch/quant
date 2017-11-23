@@ -26,9 +26,9 @@ namespace GeneticTree
         public override void Initialize()
         {
             SetCash(10000);
-            SetStartDate(Configuration.GetConfigDateTime("startDate", new DateTime(2017, 1, 12), this));
-            SetEndDate(Configuration.GetConfigDateTime("endDate", new DateTime(2017, 10, 13), this));
-            Configuration.GetConfiguration("http://www.mocky.io/v2/5a15c8f42e00005200eab80e",config);
+            SetStartDate(Configuration.GetConfigDateTime("startDate", new DateTime(2017, 11, 21), this));
+            SetEndDate(Configuration.GetConfigDateTime("endDate", new DateTime(2017, 11, 21), this));
+            Configuration.GetConfiguration(Configuration.configUrl, config);
             if (IsOutOfSampleRun)
             {
                 //var startDate = new DateTime(year: 2016, month: 1, day: 1);
@@ -84,6 +84,7 @@ namespace GeneticTree
                     ExitSignal(entry);
                 }
             }
+            RiskManager.UpdateTrailingStopOrders(data);
         }
 
         public void ExitSignal(Rule signal)
@@ -91,7 +92,7 @@ namespace GeneticTree
 
             if (verbose && signal.IsTrue())
             {
-                Log(string.Format("signal symbol:: {0}", signal.Symbol));
+                Log(string.Format("signal to liquidate symbol:: {0} exchange time {1}", signal.Symbol, Time));
             }
             if (Portfolio[signal.Symbol].Invested && signal.IsTrue())
             {
@@ -135,11 +136,11 @@ namespace GeneticTree
                 }
             }
         }
-        private static Dictionary<string, int> config = new Dictionary<string, int> {
-            {"period",  1},
-            {"slowPeriod",  200},
-            {"fastPeriod",  20},
-            {"signalPeriod",  4 }
+        private static Dictionary<string, string> config = new Dictionary<string, string> {
+            {"period",  "1"},
+            {"slowPeriod",  "200"},
+            {"fastPeriod",  "20"},
+            {"signalPeriod",  "4" }
         };
 
         /*

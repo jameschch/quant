@@ -32,6 +32,8 @@ namespace GeneticTree
         // Smallest lot
         public static LotSize _lotSize = LotSize.Nano;
 
+        public static string configUrl = "http://www.mocky.io/v2/5a1718ff310000fa1f8d3531";
+
         /// <summary>
         ///     Gets the gene int from key.
         /// </summary>
@@ -94,7 +96,7 @@ namespace GeneticTree
             return gene;
         }
 
-        public static Dictionary<string, int> GetConfiguration(string url,Dictionary<string, int> config)
+        public static Dictionary<string, string> GetConfiguration(string url,Dictionary<string, string> config)
         {
 
             JObject jobj = JObject.Parse(LoadDataConfig(url));
@@ -104,29 +106,35 @@ namespace GeneticTree
                 
                 string ruleName = rule["name"].ToString();
                 JObject indicators = (JObject)rule["indicators"];
+
+                config.Add(ruleName + "Expression", indicators["Expression"].ToString());
                     var j = 1;
                     foreach (JToken v in (JArray)indicators["Signal"])
                     {
-                    config.Add(ruleName + "Indicator" + j, int.Parse(v.ToString()));
+                    config.Add(ruleName + "Indicator" + j, v.ToString());
                         j++;
                     }
-                config.Add(ruleName + "NumberOfSignals", j-1);
+                config.Add(ruleName + "NumberOfSignals", ""+(j-1));
                     j = 1;
                 foreach (JToken v in (JArray)indicators["Direction"])
                     {
-                    config.Add(ruleName + "Indicator" + j + "Direction", int.Parse(v.ToString()));
+                    config.Add(ruleName + "Indicator" + j + "Direction", v.ToString());
                         j++;
                     }
+                if(indicators["Operator"]!=null)
+                {
                     j = 1;
-                foreach (JToken v in (JArray)indicators["Operator"])
+                    foreach (JToken v in (JArray)indicators["Operator"])
                     {
-                    config.Add(ruleName + "Operator" + j, int.Parse(v.ToString()));
+                        config.Add(ruleName + "Operator" + j, v.ToString());
                         j++;
                     }
+                }
+
                     j = 1;
                 foreach (JToken v in (JArray)indicators["Relationship"])
                     {
-                    config.Add(ruleName + "Relationship" + j, int.Parse(v.ToString()));
+                    config.Add(ruleName + "Relationship" + j, v.ToString());
                         j++;
                     }
 

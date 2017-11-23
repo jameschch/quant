@@ -14,9 +14,17 @@ namespace GeneticTree
 
         public IEnumerable<ISignal> List { get; }
         public Symbol Symbol { get; }
+        public string Expression { get; }
         public Rule(Symbol symbol, IEnumerable<ISignal> signal)
         {
             List = signal;
+            Symbol = symbol;
+        }
+
+        public Rule(Symbol symbol, IEnumerable<ISignal> signal, string expression)
+        {
+            List = signal;
+            Expression = expression;
             Symbol = symbol;
         }
 
@@ -26,6 +34,32 @@ namespace GeneticTree
         }
 
         public bool IsTrue()
+        {
+            if(Expression.Length>0)
+            {
+                return FixedExpressionIsTrue();
+            }
+            else
+            {
+                return GeneticIsTrue();
+            }
+        }
+
+        private bool FixedExpressionIsTrue()
+        {
+            object[] signals = new object[List.Count()];
+            for (int i = 0; i < List.Count(); i++)
+            {
+                signals[i] = List.ElementAt(i).IsTrue();
+            }
+
+            var tokens = new Tokenizer(string.Format(Expression, signals)).Tokenize();
+            var parser = new Parser(tokens);
+            var result = parser.Parse();
+            return result;
+        }
+
+        private bool GeneticIsTrue()
         {
             string expression = "";
 
@@ -43,33 +77,35 @@ namespace GeneticTree
                     isTrue += ")";
                 }
 
-                expression = expression+(isTrue);
+                expression = expression + (isTrue);
 
                 if (item.Child != null)
                 {
                     if (item.Operator == Operator.And)
                     {
-                        expression = expression +(" and ");
+                        expression = expression + (" and ");
                     }
                     else if (new[] { Operator.Or, Operator.OrInclusive }.Contains(item.Operator))
                     {
-                        expression = expression +(" or ");
+                        expression = expression + (" or ");
                     }
                     else if (item.Operator == Operator.Not)
                     {
-                        expression = expression +(" and !");
+                        expression = expression + (" and !");
                     }
                     else if (new[] { Operator.Nor, Operator.NorInclusive }.Contains(item.Operator))
                     {
-                        expression = expression +(" or !");
+                        expression = expression + (" or !");
                     }
                 }
             }
 
             var tokens = new Tokenizer(expression.ToString()).Tokenize();
             var parser = new Parser(tokens);
-            return parser.Parse();
+            var result = parser.Parse();
+            return result;
         }
+
 
         public void Update(BaseData data)
         {

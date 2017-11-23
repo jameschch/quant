@@ -49,6 +49,7 @@ namespace GeneticTree
             _slowPeriod = GetConfigValue("slowPeriod");
             _fastPeriod = GetConfigValue("fastPeriod");
             _signalPeriod = GetConfigValue("signalPeriod");
+            var expression = GetConfigStringValue(entryOrExit+"Expression");
             var numberOfSignals = GetConfigValue(entryOrExit+"NumberOfSignals");
             ISignal parent = null;
             List<ISignal> list = new List<ISignal>();
@@ -60,7 +61,7 @@ namespace GeneticTree
                 {
                     parent.Child = item;
                 }
-
+                /*
                 //last item won't have operator
                 if (i < numberOfSignals)
                 {
@@ -68,14 +69,14 @@ namespace GeneticTree
                     Operator op = (Operator)GetConfigValue(key);
                     item.Operator = op;
                 }
-
+                */
                 item.Parent = parent;
                 parent = item;
 
                 list.Add(item);
             }
 
-            return new Rule(symbol, list);
+            return new Rule(symbol, list, expression);
         }
 
         protected override ISignal CreateIndicator(Symbol pair, int i, string entryOrExit)
@@ -107,16 +108,16 @@ namespace GeneticTree
 
                 case TechnicalIndicator.MovingAverageConvergenceDivergence:
                     var macd = _algorithm.MACD(pair, fastPeriod: 12, slowPeriod: 26, signalPeriod: 9, type:MovingAverageType.Simple, resolution:_resolution);
-                    signal = new CrossingMovingAverageSignal(macd, macd.Signal, direction, 4);
+                    signal = new CrossingMovingAverageSignal(macd, macd.Signal, direction, 1);
                     break;
 
                 case TechnicalIndicator.Stochastic:
                     var sto = _algorithm.STO(pair, period: 14, resolution:_resolution);
-                    signal = new OscillatorSignal(sto, new[] { 20, 80 }, direction, 4);
+                    signal = new OscillatorSignal(sto, new[] { 20, 80 }, direction, 3);
                     break;
 
                 case TechnicalIndicator.RelativeStrengthIndex:
-                    var rsi = _algorithm.RSI(pair, period: 14);
+                    var rsi = _algorithm.RSI(pair, period: 11);
                     signal = new OscillatorSignal(rsi, new[] { 30, 70 }, direction);
                     break;
 
@@ -159,7 +160,7 @@ namespace GeneticTree
 
                 case TechnicalIndicator.BollingerBands:
                     var bb = _algorithm.BB(pair, period: 20, k: 2);
-                    signal = new BBOscillatorSignal(bb, direction, 5);
+                    signal = new BBOscillatorSignal(bb, direction, 4);
                     break;
 
                 case TechnicalIndicator.ChannelBreakout:
@@ -167,7 +168,7 @@ namespace GeneticTree
                     var _max = delay.Of(_algorithm.MAX(pair, 20));
                     var _min = delay.Of(_algorithm.MIN(pair, 20));
                     var cur = _algorithm.MAX(pair, 1); //current value
-                    signal = new ChannelOscillatorSignal(cur,_max, _min, direction);
+                    signal = new ChannelOscillatorSignal(cur,_max, _min, direction, 4);
                     break;
             
                 case TechnicalIndicator.DonchianTrend:
@@ -180,6 +181,29 @@ namespace GeneticTree
 
             return signal;
         }
+
+        protected string GetConfigStringValue(string key)
+        {
+            string value;
+
+            value = _algorithm.GetParameter(key);
+            if(value !=null)
+            {
+                value = Config.GetValue<string>(key, value);
+            }
+            if (_enableParameterLog)
+            {
+                _algorithm.Log(string.Format("Parameter {0} set to {1}", key, value));
+            }
+            if (value == null)
+            {
+                throw new ArgumentNullException(key,
+                    "The gene " + key + " is not present either as Config or as Parameter");
+            }
+
+            return value;
+        }
+
 
         protected override int GetConfigValue(string key)
         {
@@ -202,7 +226,6 @@ namespace GeneticTree
             return value;
         }
     }
-
     public abstract class AbstractSignalFactory
     {
         public abstract Rule Create(QCAlgorithm algorithm, Symbol symbol, bool isEntryRule, Resolution resolution = Resolution.Hour);

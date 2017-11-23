@@ -7,7 +7,8 @@
       "indicators": {
         "Signal": [ 1, 2, 10 ],
         "Direction": [ 0, 0, 0 ],
-        "Operator": [ 0, 0],
+        "Expression": "{0} and {1} and {2}",
+        "_Operator": [ 0, 0 ],
         "Relationship": [ 1, 1 ]
       }
     },
@@ -16,10 +17,11 @@
       "type": "exit",
       "direction": "short",
       "indicators": {
-        "Signal": [ 4, 0, 1, 2, 7, 8 ],
-        "Direction": [ 1, 1, 1, 1, 1 , 1 ],
-        "Operator": [ 0, 0, 1, 0, 1 ],
-        "Relationship": [ 1, 1, 1, 1 ]
+        "Signal": [ 1, 2 ],
+        "Direction": [ 1, 1 ],
+        "Expression": "{0} and {1}",
+        "_Operator": [ 0, 0 ],
+        "Relationship": [ 1, 1 ]
       }
     }
   ],
